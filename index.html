@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="tree-api" content="http://localhost:8787">
+    <meta name="theme-color" content="#f4f5f1">
+    <title>Treeview</title>
+    <link rel="icon" href="assets/tree-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="src/styles.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Treeview home">
+        <img src="assets/tree-mark.svg" alt="" width="42" height="42">
+        <span>Treeview</span>
+      </a>
+      <p>Typed data, branching freely.</p>
+    </header>
+    <main>
+      <tree-editor></tree-editor>
+    </main>
+    <script type="module" src="src/tree-editor.mjs"></script>
+  </body>
+</html>
