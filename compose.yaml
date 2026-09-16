@@ -1,0 +1,47 @@
+name: project-auto-treeview
+
+services:
+  contract:
+    build:
+      context: ./services/contract
+    restart: "no"
+
+  backend:
+    build:
+      context: ./services/backend
+    environment:
+      CORS_ORIGIN: http://localhost:4173
+      HOST: 0.0.0.0
+      PORT: 8787
+      TREE_DATA_FILE: /app/var/tree.json
+    ports:
+      - "8787:8787"
+    volumes:
+      - tree-data:/app/var
+    depends_on:
+      contract:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:8787/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  frontend:
+    build:
+      context: .
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4173
+    ports:
+      - "4173:4173"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  tree-data:

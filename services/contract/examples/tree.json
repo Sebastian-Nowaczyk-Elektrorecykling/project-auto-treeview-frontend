@@ -1,0 +1,28 @@
+{
+  "revision": 3,
+  "root": {
+    "id": "root",
+    "data": {
+      "kind": "text",
+      "value": "Workshop"
+    },
+    "children": [
+      {
+        "id": "temperature",
+        "data": {
+          "kind": "number",
+          "value": 21.5
+        },
+        "children": []
+      },
+      {
+        "id": "online",
+        "data": {
+          "kind": "boolean",
+          "value": true
+        },
+        "children": []
+      }
+    ]
+  }
+}

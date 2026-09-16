@@ -1,0 +1,145 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Project Auto Treeview API",
+    "version": "0.1.0",
+    "description": "Read and atomically replace a recursive tree of nodes containing one typed datum each. Implementations additionally enforce a maximum depth of 32 and a maximum of 5000 nodes."
+  },
+  "servers": [{ "url": "http://localhost:8787" }],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "responses": {
+          "200": {
+            "description": "Service is ready",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } }
+          }
+        }
+      }
+    },
+    "/tree": {
+      "get": {
+        "operationId": "getTree",
+        "responses": {
+          "200": {
+            "description": "Current tree snapshot",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreeSnapshot" } } }
+          }
+        }
+      },
+      "put": {
+        "operationId": "replaceTree",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReplaceTreeRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated tree snapshot",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreeSnapshot" } } }
+          },
+          "409": {
+            "description": "Revision conflict",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          },
+          "422": {
+            "description": "Invalid tree",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ApiError" } } }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["status"],
+        "properties": { "status": { "const": "ok" } }
+      },
+      "NodeId": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{1,64}$"
+      },
+      "TextDatum": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "value"],
+        "properties": {
+          "kind": { "const": "text" },
+          "value": { "type": "string", "maxLength": 10000 }
+        }
+      },
+      "NumberDatum": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "value"],
+        "properties": {
+          "kind": { "const": "number" },
+          "value": { "type": "number" }
+        }
+      },
+      "BooleanDatum": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "value"],
+        "properties": {
+          "kind": { "const": "boolean" },
+          "value": { "type": "boolean" }
+        }
+      },
+      "Datum": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/TextDatum" },
+          { "$ref": "#/components/schemas/NumberDatum" },
+          { "$ref": "#/components/schemas/BooleanDatum" }
+        ],
+        "discriminator": { "propertyName": "kind" }
+      },
+      "TreeNode": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "data", "children"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/NodeId" },
+          "data": { "$ref": "#/components/schemas/Datum" },
+          "children": {
+            "type": "array",
+            "maxItems": 100,
+            "items": { "$ref": "#/components/schemas/TreeNode" }
+          }
+        }
+      },
+      "TreeSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["revision", "root"],
+        "properties": {
+          "revision": { "type": "integer", "minimum": 0 },
+          "root": { "$ref": "#/components/schemas/TreeNode" }
+        }
+      },
+      "ReplaceTreeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["expectedRevision", "root"],
+        "properties": {
+          "expectedRevision": { "type": "integer", "minimum": 0 },
+          "root": { "$ref": "#/components/schemas/TreeNode" }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "currentRevision": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}
