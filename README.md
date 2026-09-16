@@ -12,8 +12,12 @@ npm run serve
 ```
 
 Open `http://localhost:4173`. The default API is `http://localhost:8787`; change
-the `tree-api` meta tag in `index.html` for another deployment.
+the `tree-api` meta tag in `index.html` for another deployment. Set `HOST` or
+`PORT` to change the static server bind address.
 
-Run model tests with `npm test`. This frontend implements version `0.1.0` of
-`project-auto-treeview-contract`. Merge the contract PR, then backend, then this
-frontend.
+Run model tests with `npm test`. The included `Dockerfile` runs the static
+server as a non-root user. The complete frontend/backend setup is defined by
+`compose.yaml` in `project-auto-treeview-contract`.
+
+This frontend implements version `0.1.0` of `project-auto-treeview-contract`.
+Merge the contract PR, then backend, then this frontend.

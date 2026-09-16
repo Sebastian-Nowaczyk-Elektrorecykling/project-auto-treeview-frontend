@@ -5,6 +5,7 @@ import { extname, join, normalize } from "node:path";
 
 const types = { ".css": "text/css", ".html": "text/html", ".mjs": "text/javascript", ".svg": "image/svg+xml" };
 const root = new URL("../", import.meta.url).pathname;
+const host = process.env.HOST ?? "127.0.0.1";
 const port = Number(process.env.PORT ?? 4173);
 
 createServer(async (request, response) => {
@@ -23,4 +24,4 @@ createServer(async (request, response) => {
   } catch {
     response.writeHead(404).end("Not found");
   }
-}).listen(port, "127.0.0.1", () => console.log(`Treeview frontend at http://127.0.0.1:${port}`));
+}).listen(port, host, () => console.log(`Treeview frontend at http://${host}:${port}`));
